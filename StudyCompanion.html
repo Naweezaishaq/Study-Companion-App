@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Study Companion</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+  body {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: #fffaf3;
+    border-radius: 18px;
+    box-shadow: 0 8px 28px rgba(180,120,60,0.2);
+    overflow: hidden;
+  }
+  header {
+    background: #d2691e;
+    color: white;
+    padding: 18px 20px;
+    text-align: center;
+  }
+  header h1 { font-size: 20px; margin-bottom: 2px; }
+  header .tagline { font-size: 12px; opacity: 0.9; }
+
+  nav {
+    display: flex;
+    background: #fff3e0;
+    border-bottom: 2px solid #f0c896;
+    overflow-x: auto;
+  }
+  nav button {
+    flex: 1;
+    padding: 12px 6px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 12px;
+    color: #a1673a;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  nav button.active {
+    color: #d2691e;
+    border-bottom: 3px solid #d2691e;
+    font-weight: bold;
+  }
+
+  main { padding: 18px; }
+  .tab { display: none; }
+  .tab.active { display: block; }
+
+  h2 { font-size: 15px; color: #d2691e; margin-bottom: 10px; }
+
+  /* Chat */
+  #chatBox {
+    background: #fff3e0;
+    border: 1px solid #f0c896;
+    height: 220px;
+    border-radius: 10px;
+    padding: 10px;
+    overflow-y: scroll;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+  #chatBox p { margin: 5px 0; color: #4a3624; line-height: 1.4; }
+  #chatBox b { color: #d2691e; }
+
+  .row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  input[type="text"], input[type="date"] {
+    flex: 1;
+    min-width: 100px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid #f0c896;
+    background: white;
+    font-size: 13px;
+    color: #4a3624;
+  }
+  button.primary {
+    padding: 9px 14px;
+    background: #d2691e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  button.primary:hover { background: #b5591a; }
+  button.full { width: 100%; }
+  button.soft { background: #f4a261; }
+  button.soft:hover { background: #e0904f; }
+
+  /* Items (tasks/goals) */
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 0;
+    border-bottom: 1px solid #f4e3c8;
+    font-size: 13px;
+    color: #4a3624;
+  }
+  .item:last-child { border-bottom: none; }
+  .item.done { opacity: 0.5; text-decoration: line-through; }
+  .item-text { flex: 1; }
+  .item-date { font-size: 11px; color: #b5591a; }
+  .del-btn {
+    background: #e07a5f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .del-btn:hover { background: #c95f45; }
+
+  .empty { text-align: center; color: #c9a37a; padding: 14px; font-size: 12px; }
+
+  /* Timeline */
+  .timeline-entry {
+    border-left: 3px solid #d2691e;
+    padding-left: 12px;
+    margin-bottom: 12px;
+  }
+  .timeline-entry .tl-date { font-size: 11px; color: #b5591a; font-weight: bold; }
+  .timeline-entry .tl-text { font-size: 13px; color: #4a3624; }
+
+  /* Motivation */
+  .quote-box {
+    background: #fff3e0;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    font-size: 15px;
+    color: #4a3624;
+    font-style: italic;
+    min-height: 60px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>🌻 Study Companion</h1>
+    <div class="tagline">You're doing better than you think.</div>
+  </header>
+
+  <nav>
+    <button class="tab-btn active" data-tab="chat">💬 Chat</button>
+    <button class="tab-btn" data-tab="tasks">✅ Tasks</button>
+    <button class="tab-btn" data-tab="goals">🎯 Goals</button>
+    <button class="tab-btn" data-tab="timeline">📅 Timeline</button>
+    <button class="tab-btn" data-tab="motivation">🌼 Motivation</button>
+  </nav>
+
+  <main>
+
+    <!-- CHAT -->
+    <div class="tab active" id="chat">
+      <div id="chatBox">
+        <p><b>Companion:</b> Hi! How are you feeling about your studies today?</p>
+      </div>
+      <div class="row">
+        <input type="text" id="userInput" placeholder="Tell me how you're feeling...">
+        <button class="primary" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <!-- TASKS -->
+    <div class="tab" id="tasks">
+      <h2>Add a Task</h2>
+      <div class="row">
+        <input type="text" id="taskInput" placeholder="Task name...">
+        <input type="date" id="taskDate">
+      </div>
+      <button class="primary full" onclick="addTask()">Add Task</button>
+      <br><br>
+      <h2>Your Tasks</h2>
+      <div id="taskList"></div>
+    </div>
+
+    <!-- GOALS -->
+    <div class="tab" id="goals">
+      <h2>Add a Goal</h2>
+      <div class="row">
+        <input type="text" id="goalInput" placeholder="e.g. Finish AI certification">
+        <input type="date" id="goalDate">
+      </div>
+      <button class="primary full" onclick="addGoal()">Add Goal</button>
+      <br><br>
+      <h2>Your Goals</h2>
+      <div id="goalList"></div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="tab" id="timeline">
+      <h2>Upcoming Timeline</h2>
+      <div id="timelineList"></div>
+    </div>
+
+    <!-- MOTIVATION -->
+    <div class="tab" id="motivation">
+      <div class="quote-box" id="quoteBox">Tap the button for a little encouragement.</div>
+      <br>
+      <button class="soft full" onclick="showQuote()">🌼 Cheer Me Up</button>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ---------- TAB SWITCHING ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'timeline') renderTimeline();
+    });
+  });
+
+  // ---------- DATA ----------
+  let tasks = JSON.parse(localStorage.getItem('sc_tasks')) || [];
+  let goals = JSON.parse(localStorage.getItem('sc_goals')) || [];
+
+  function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+  // ---------- TASKS ----------
+  function addTask() {
+    const text = document.getElementById('taskInput').value.trim();
+    const date = document.getElementById('taskDate').value;
+    if (!text) { alert('Please enter a task.'); return; }
+    tasks.push({ id: Date.now(), text, date, done: false });
+    document.getElementById('taskInput').value = '';
+    document.getElementById('taskDate').value = '';
+    save('sc_tasks', tasks);
+    renderTasks();
+  }
+
+  function toggleTask(id) {
+    tasks = tasks.map(t => t.id === id ? { ...t, done: !t.done } : t);
+    save('sc_tasks', tasks);
+    renderTasks();
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    save('sc_tasks', tasks);
+    renderTasks();
+  }
+
+  function renderTasks() {
+    const list = document.getElementById('taskList');
+    list.innerHTML = '';
+    if (tasks.length === 0) { list.innerHTML = '<div class="empty">No tasks yet</div>'; return; }
+    tasks.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'item' + (t.done ? ' done' : '');
+      div.innerHTML = `
+        <input type="checkbox" ${t.done ? 'checked' : ''} onclick="toggleTask(${t.id})">
+        <span class="item-text">${t.text}</span>
+        ${t.date ? `<span class="item-date">${t.date}</span>` : ''}
+        <button class="del-btn" onclick="deleteTask(${t.id})">×</button>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // ---------- GOALS ----------
+  function addGoal() {
+    const text = document.getElementById('goalInput').value.trim();
+    const date = document.getElementById('goalDate').value;
+    if (!text) { alert('Please enter a goal.'); return; }
+    goals.push({ id: Date.now(), text, date, done: false });
+    document.getElementById('goalInput').value = '';
+    document.getElementById('goalDate').value = '';
+    save('sc_goals', goals);
+    renderGoals();
+  }
+
+  function toggleGoal(id) {
+    goals = goals.map(g => g.id === id ? { ...g, done: !g.done } : g);
+    save('sc_goals', goals);
+    renderGoals();
+  }
+
+  function deleteGoal(id) {
+    goals = goals.filter(g => g.id !== id);
+    save('sc_goals', goals);
+    renderGoals();
+  }
+
+  function renderGoals() {
+    const list = document.getElementById('goalList');
+    list.innerHTML = '';
+    if (goals.length === 0) { list.innerHTML = '<div class="empty">No goals yet</div>'; return; }
+    goals.forEach(g => {
+      const div = document.createElement('div');
+      div.className = 'item' + (g.done ? ' done' : '');
+      div.innerHTML = `
+        <input type="checkbox" ${g.done ? 'checked' : ''} onclick="toggleGoal(${g.id})">
+        <span class="item-text">${g.text}</span>
+        ${g.date ? `<span class="item-date">${g.date}</span>` : ''}
+        <button class="del-btn" onclick="deleteGoal(${g.id})">×</button>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // ---------- TIMELINE ----------
+  function renderTimeline() {
+    const list = document.getElementById('timelineList');
+    const combined = [
+      ...tasks.filter(t => t.date && !t.done).map(t => ({ ...t, type: 'Task' })),
+      ...goals.filter(g => g.date && !g.done).map(g => ({ ...g, type: 'Goal' }))
+    ].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    list.innerHTML = '';
+    if (combined.length === 0) {
+      list.innerHTML = '<div class="empty">No upcoming dated items. Add dates to your tasks or goals.</div>';
+      return;
+    }
+    combined.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'timeline-entry';
+      div.innerHTML = `
+        <div class="tl-date">${item.date} — ${item.type}</div>
+        <div class="tl-text">${item.text}</div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // ---------- CHAT ----------
+  function sendMessage() {
+    const userText = document.getElementById('userInput').value.trim();
+    if (!userText) return;
+
+    const chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML += `<p><b>You:</b> ${userText}</p>`;
+
+    const reply = getReply(userText);
+    chatBox.innerHTML += `<p><b>Companion:</b> ${reply}</p>`;
+
+    document.getElementById('userInput').value = '';
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  document.getElementById('userInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  function getReply(message) {
+    message = message.toLowerCase();
+    if (message.includes('hi') || message.includes('hello')) {
+      return "Hey there! Ready to tackle something today, or just need a little encouragement first?";
+    } else if (message.includes('stressed') || message.includes('anxious') || message.includes('nervous')) {
+      return "That's completely understandable. Take a slow breath. One small step at a time is enough.";
+    } else if (message.includes('tired') || message.includes('exhausted')) {
+      return "Rest is part of studying too. A short break now will help you focus better later.";
+    } else if (message.includes("can't focus") || message.includes('distracted') || message.includes('procrastinat')) {
+      return "That happens to everyone. Try just 10 minutes on one small task — momentum builds from there.";
+    } else if (message.includes('failed') || message.includes('bad grade')) {
+      return "One result doesn't define your ability. What matters is what you do with it next.";
+    } else if (message.includes('exam') || message.includes('test')) {
+      return "Exams feel big in the moment, but they're just one checkpoint. Trust the work you've put in.";
+    } else if (message.includes('thank')) {
+      return "Anytime. I'm proud of you for showing up and trying.";
+    } else if (message.includes('sad') || message.includes('down')) {
+      return "I'm sorry you're feeling that way. Be gentle with yourself today.";
+    } else {
+      return "I hear you. Check your Tasks or Goals tab, or tap Cheer Me Up if you need a boost.";
+    }
+  }
+
+  // ---------- MOTIVATION ----------
+  const quotes = [
+    "Tomorrow never comes. Do it today.",
+    "Progress, not perfection.",
+    "You don't have to see the whole staircase, just take the next step.",
+    "Every expert was once a beginner who didn't quit.",
+    "Small consistent effort beats occasional bursts of motivation.",
+    "You are capable of more than you know.",
+    "Rest, then keep going. Both are part of the journey."
+  ];
+
+  function showQuote() {
+    const i = Math.floor(Math.random() * quotes.length);
+    document.getElementById('quoteBox').textContent = quotes[i];
+  }
+
+  // ---------- INIT ----------
+  renderTasks();
+  renderGoals();
+</script>
+
+</body>
+</html>
